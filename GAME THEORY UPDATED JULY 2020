@@ -1,0 +1,691 @@
+pragma solidity >=0.4.0 <0.6.0;
+ 
+
+
+ import "./EscrowComplianceCecker.sol";
+ import  "./Industry.sol";
+ contract   GameTheory  {
+          uint  i=0; 
+      
+
+      // PEOPLES 
+       struct Entities {
+       address participantaddress;
+       bytes32  participantnames;
+        bytes32    participantrole;
+        uint participantcount;
+       uint price;
+       uint theentitiescount;
+       address payable thepayingentityaddress;
+       bytes32 RFIDS;
+    
+      mapping (address => Entities[1000]) thegreatentitylist;
+      mapping (bytes32 => Entities[1000]) thegreatentityset;
+
+       }
+       
+        Entities[] public theentitystore; 
+        Entities entityobject;
+       
+        
+           //BIDS
+        struct Bids {
+       bytes32  bidname;
+       address bidderaddress;
+       bytes32 biddername;
+        bytes32 bidrole;
+        uint bidcount;
+        
+    
+      mapping (address => Bids[1000]) bidstores;
+      mapping (bytes32 => Bids[1000]) thebidclaims;
+
+       }
+       
+        Bids[] public bidscollection; 
+        Bids BidObject;
+
+               struct Strategies {
+       address  strategiesaddress;
+       bytes32  strategiesname;
+       bytes32  stragiesdescription;
+       bytes32 strategiesplayername;
+       address strategiesplayeraddress;
+      
+       uint strategiescount;
+        
+    
+    
+      mapping (bytes32 => Strategies[1000]) strategieslist;
+       mapping (address => Strategies[1000]) strategiesarray;
+       }
+       
+        Strategies[] public strategiesconstruct; 
+        Strategies StrategiesObject;
+        
+        
+               struct Contract {
+       address  contractaddress;
+       bytes32  contracttypename;
+       bytes32  contractdescription;
+       uint contracttypecount;
+       bytes32 contractplayername;
+       address contractplayeraddress;
+      
+        
+    
+      mapping (address => Contract[1000]) contractlist;
+      mapping (bytes32 => Contract[1000]) contractset;
+
+       }
+       
+        Contract[] public contractlister; 
+        Contract ContractObject;
+        
+        
+
+         //OPTIMAL RETAILER  ORDER QUANTITY
+ struct OptimalRetailOrder {
+        address  retailorordereraddress;
+       bytes32  retailerordername;
+        bytes32   retailerorderrole;
+       uint      optimalretailordervalue;
+       uint          optimalretailorordercount;
+       
+      mapping (address => OptimalRetailOrder[1000]) optimalretailordercollection;
+      mapping (bytes32 => OptimalRetailOrder[1000]) optimalretailorderstorage;
+
+       }
+ 
+        OptimalRetailOrder[] public orderretailcollection; 
+        OptimalRetailOrder orderretailorObject;
+
+           // OPTIMAL SUPPLIER ORDER QUANTITY
+ struct OptimalSupplyOrder {
+  address  supplyerordereraddress;
+       bytes32  supplyordername;
+        bytes32   supplyerorderrole;
+       uint      optimalsupplyordervalue;
+       uint          optimalsupplyordercount;
+       
+      mapping (address => OptimalSupplyOrder[1000]) optimalsupplyordercollection;
+      mapping (bytes32 => OptimalSupplyOrder[1000]) optimalsupplyorderstorage;
+
+       }
+       
+ 
+
+         OptimalSupplyOrder[] public forsupplyordercollection; 
+        OptimalSupplyOrder forsupplyorderObject;
+
+            // OPTIMAL TOTAL SUPPLY CHAIN ORDER QUANTITY
+
+        struct OptimalTotalSupplyChainOrder {
+       address  totalsupplyeraddress;
+       bytes32  totalsupplyname;
+        
+       uint      optimaltotalsupplyvalue;
+       uint          optimaltotalsupplycount;
+       
+      mapping (address => OptimalTotalSupplyChainOrder[1000]) optimaltotalsupplyordercollection;
+      mapping (bytes32 => OptimalTotalSupplyChainOrder[1000]) optimaltotalsupplyorderstorage;
+
+       }
+       
+ 
+  OptimalTotalSupplyChainOrder[] public ourtotalsupplyordercollection; 
+        OptimalTotalSupplyChainOrder fortotalordersupplyObject;
+
+          //OPTIMAL RETAILER PAYOFF
+         struct OptimalRetailPayoffs {
+       address  retailpayoffaddress;
+       bytes32  retailpayoffname;
+        bytes32   retailpayoffrole;
+       uint      optimalretailpayoffvalue;
+       uint          optimalretailpayoffcount;
+       
+      mapping (address => OptimalRetailPayoffs[1000]) optimalretailpayoffcollection;
+      mapping (bytes32 => OptimalRetailPayoffs[1000]) optimalretailpayoffstorage;
+
+       }
+       
+ 
+  OptimalRetailPayoffs[] public payforretailcollection; 
+        OptimalRetailPayoffs payforretailObject;
+
+        // SUPPLIER OPTIMAL PAYOFF
+
+ struct OptimalSupplyPayoffs {
+       address  supplyerpayoffaddress;
+       bytes32  supplypayoffname;
+        bytes32   supplyerpayoffrole;
+       uint      optimalsupplypayoffvalue;
+       uint          optimalsupplypayoffcount;
+       
+      mapping (address => OptimalSupplyPayoffs[1000]) optimalsupplypayoffcollection;
+      mapping (bytes32 => OptimalSupplyPayoffs[1000]) optimalsupplypayoffstorage;
+
+       }
+       
+ 
+  OptimalSupplyPayoffs[] public payforsupplycollection; 
+        OptimalSupplyPayoffs payforsupplyObject;
+
+
+               //OPTIMAL TOTAL SUPPLIER AND RETAILER PAYOFF FOR 
+
+  struct OptimalTotalSupplyPayoffs {
+       address  totalsupplypayoffaddress;
+       bytes32  totalsupplypayoffname;
+        bytes32   totalsupplypayoffstatus;
+       uint      optimaltotalpayoffvalue;
+       uint          optimaltotalpayoffcount;
+       
+      mapping (address => OptimalTotalSupplyPayoffs[1000]) optimaltotalsupplypayoffcollection;
+      mapping (bytes32 => OptimalTotalSupplyPayoffs[1000]) optimaltotalsupplypayoffstorage;
+
+       }
+       
+ 
+  OptimalTotalSupplyPayoffs[] public payfortotalsupplycollection; 
+        OptimalTotalSupplyPayoffs payfortotalsupplyObject;
+
+
+
+
+     function joinBiddingGroup(address  groupparticipantaddress,  bytes32 groupparticpantname, bytes32 groupparticipantrole,address bidaddress,  bytes32 bidname ) public  returns(address  bidparticipantaddress, bytes32 bidparticipantname, bytes32 bidparticipantrole, address theselectedbidaddress,bytes32 theselectedbidname )   {
+
+     // WE PUSH INTO DATABASE AND THEN CALCULATE LEASTS
+            
+                  
+         
+
+             
+        
+
+         i=0;
+         
+       BidObject.bidcount=0;
+       i=  BidObject.bidcount;
+       
+
+        address  theparticipantaddress;
+        bytes32 theparticipantnames;
+        bytes32 theparticipantrole;
+        uint  theparticipantcount = 0;
+      
+           
+        bytes32    theparticularbidname;
+        uint theparticularbidcount = 0;
+        address theparticularbidaddress;
+      
+  
+    
+        // bidname
+        // bidaddress 
+        // entityname
+        //theentityaddress 
+        //theentity
+        // theentityage
+         BidObject.bidderaddress;
+        
+        
+            
+            
+           entityobject.thegreatentitylist[groupparticipantaddress][i].participantaddress =  groupparticipantaddress;
+             
+                   require( entityobject.thegreatentitylist[groupparticipantaddress][i].participantaddress  ==  groupparticipantaddress);
+            
+             theparticipantaddress  =  entityobject.thegreatentitylist[groupparticipantaddress][i].participantaddress;
+             theparticipantnames =   entityobject.thegreatentitylist[groupparticipantaddress][i].participantnames;
+             theparticipantrole =  entityobject.thegreatentitylist[groupparticipantaddress][i].participantrole;
+             theparticipantcount =  entityobject.thegreatentitylist[groupparticipantaddress][i].participantcount;
+           
+            theparticularbidname =BidObject.thebidclaims[bidname][i].bidname;
+             theparticularbidcount = BidObject.thebidclaims[bidname][i].bidcount;
+             theparticularbidaddress = BidObject.thebidclaims[bidname][i].bidderaddress;
+    
+    
+     bidparticipantaddress =theparticipantaddress;
+     bidparticipantname =theparticipantnames;
+    bidparticipantrole = theparticipantrole;
+     theselectedbidaddress = theparticularbidaddress;
+     theselectedbidname = theparticularbidname;
+    
+       return ( bidparticipantaddress, bidparticipantname,     bidparticipantrole,theselectedbidaddress,theselectedbidname);
+         
+         i++;
+     }
+
+
+     
+function addBid(bytes32 _bidname, bytes32 _biddername,  address payable _participant, bytes32 participantroles,uint _sellingprice, uint _salvagevalue, uint _retlossofgoodwillcost , uint _supplylossofgoodwillcost, uint supplierquantity, uint retperunitcost, uint suppliersperunitcost,  uint retordersize, uint expectedDemand, uint expectedTransferpayment,uint orderpaidperunitcost) public payable {
+
+uint  r=0; uint v = 0; uint ps=0; uint pr=0; uint SQ=0; uint sr=0; uint Q=0;   uint ED=0; uint eTP =0; uint exRPT=0; uint w=0; uint cr =0; uint expectedRetailprofit =0; 
+           uint time=0; 
+            uint counter =0;
+            i=0;
+            BidObject.bidcount =0;
+           BidObject.bidname = _bidname;
+           BidObject.bidderaddress = _participant;
+           BidObject.biddername = _biddername;
+           BidObject.bidrole = participantroles;
+           i =  BidObject.bidcount;
+
+          counter = i++;
+            r = _sellingprice;
+           v= _salvagevalue;
+
+          
+          ps= _supplylossofgoodwillcost;
+          pr = _retlossofgoodwillcost;
+           cr = retperunitcost;
+
+         SQ =supplierquantity;
+          sr = suppliersperunitcost;
+          Q= retordersize;
+          ED=expectedDemand;
+          eTP =expectedTransferpayment;
+          exRPT= expectedRetailprofit;
+
+           w = orderpaidperunitcost;
+          
+
+                        
+       
+                      // GET BID DETAILS
+                   BidObject.bidstores[_participant][counter].bidname = _bidname;
+                   BidObject.bidstores[_participant][counter].bidderaddress = _participant;
+                   BidObject.bidstores[_participant][counter].biddername = _biddername;
+                   BidObject.bidstores[_participant][counter].bidrole =  participantroles;
+
+                        //PUSH  THE DETAILS OF THE OTHER BIDDING VALUES
+          
+              bidscollection.push(GameTheory.Bids(
+     {
+      bidname:  BidObject.bidstores[_participant][counter].bidname,
+      bidderaddress: BidObject.bidstores[_participant][counter].bidderaddress,
+      biddername:  BidObject.bidstores[_participant][counter].biddername,
+      bidrole:  BidObject.bidstores[_participant][counter].bidrole,
+      bidcount:  BidObject.bidstores[_participant][counter].bidcount
+ 
+
+        
+        
+    }));  
+
+           //ADDING VARIABLE VALUES
+               //CALCULATE EXPECTED RETAILOR'S PROFIT
+                require(BidObject.bidstores[_participant][counter].bidrole == 'Supplier');
+              
+           GameTheory.calculate_supplyOptimalOrderquantity(r, v, pr , ps, SQ, cr, sr,Q, ED, eTP);
+           GameTheory.calculate_ExpectedSupplyProfit(ps, SQ, sr,Q, ED, eTP, w );
+               
+               
+               //CALCULATE EXPECTED RETAILOR'S PROFIT
+                require(BidObject.bidstores[_participant][counter].bidrole == 'Retailor');
+             
+             GameTheory.calculate_retailOptimalOrderquantity(r, v, pr , ps, SQ, cr, sr,  Q, ED, eTP); 
+           
+         
+         
+           GameTheory.calculate_ExpectedRetailorProfit(r, v,pr,SQ,cr,Q,ED, eTP, w);
+              
+        
+
+                 //WE CALCULATE THE OPTIMAL ORDER QUANTITY
+               
+              GameTheory.calculate_optimalOrderquantity(r, v, pr , ps, SQ, cr, sr, Q, ED, eTP);
+             
+
+          counter++;
+
+}
+
+     
+
+
+   function chooseStrategies(address  playeraddress, bytes32 playername,  address strategiesaddresshere, bytes32 strategiesherename, bytes32 strategiesheretype) public returns(address strategiesgivenaddress, bytes32 playergivenname,  address playergivenaddress, bytes32 strategiesgivenname, bytes32 strategiesgiventype)   {
+         i=0;
+              
+             StrategiesObject.strategiescount =0;
+        i= StrategiesObject.strategiescount;
+
+
+
+       
+
+        
+           StrategiesObject.strategiesarray[playeraddress][i].strategiesplayeraddress =  playeraddress;
+           StrategiesObject.strategieslist[playername][i].strategiesplayername = playername;
+           StrategiesObject.strategiesarray[playeraddress][i].strategiesaddress =  strategiesaddresshere;
+             StrategiesObject.strategieslist[playername][i].strategiesname =  strategiesherename;
+           StrategiesObject.strategieslist[playername][i].stragiesdescription = strategiesheretype;
+          
+             
+                   require( StrategiesObject.strategiesarray[playeraddress][i].strategiesplayeraddress  ==  playeraddress);
+             
+         
+             strategiesgivenaddress = StrategiesObject.strategiesarray[playeraddress][i].strategiesaddress;
+             strategiesgivenname = StrategiesObject.strategieslist[playername][i].strategiesname;
+             strategiesgiventype = StrategiesObject.strategieslist[playername][i].stragiesdescription;
+            
+             playergivenname= StrategiesObject.strategieslist[playername][i].strategiesplayername;
+              playergivenaddress = StrategiesObject.strategiesarray[playeraddress][i].strategiesplayeraddress;
+
+             
+
+             
+             
+             
+         return (  strategiesgivenaddress, playergivenname,  playergivenaddress, strategiesgivenname, strategiesgiventype);
+         
+        i++;  
+     }
+
+
+   function chooseContractTypes(address contractchooseraddress, bytes32 contractchoosername, address contractchosenaddress, bytes32 contractchosenname, bytes32 contractchosentypehere) public returns(address thecontractchooseraddress, bytes32 thecontractchoosername, address thecontractchosenaddress, bytes32 thecontractchosenname)   {
+         
+         
+      i=0;
+              
+            ContractObject.contracttypecount =0;
+        i= ContractObject.contracttypecount;
+        
+        
+       
+        
+           ContractObject.contractlist[contractchooseraddress][i].contractplayeraddress =  contractchooseraddress;
+           ContractObject.contractset[contractchoosername][i].contractplayername = contractchoosername;
+           ContractObject.contractlist[contractchooseraddress][i].contractaddress =  contractchosenaddress;
+             ContractObject.contractset[contractchosenname][i].contracttypename =  contractchosentypehere;
+          
+          
+             
+                   require(  ContractObject.contractlist[contractchooseraddress][i].contractplayeraddress  ==  contractchooseraddress);
+             
+        
+           thecontractchooseraddress =   ContractObject.contractlist[contractchooseraddress][i].contractplayeraddress;
+          thecontractchoosername = ContractObject.contractlist[contractchooseraddress][i].contractplayername;
+          thecontractchosenaddress =   ContractObject.contractlist[contractchooseraddress][i].contractaddress;
+             thecontractchosenname = ContractObject.contractset[contractchosenname][i].contracttypename;
+          
+             
+
+             
+             
+             
+         return ( thecontractchooseraddress, thecontractchoosername,  thecontractchosenaddress,  thecontractchosenname);
+         
+        i++;  
+     }
+  
+
+   function Negotiating(address negotiatoraddress, bytes32 negotiatename, bool negotiateornot ) public returns(address negotiatoraddresshere, bytes32 negotiatorfullname, bool negotiatorstatus, bytes32 negotiatealert)   {
+        
+        bool negotiateset = true;
+        
+         negotiatoraddresshere = negotiatoraddress;
+         negotiatorfullname = negotiatename;
+        negotiatorstatus = negotiateornot;
+        
+            require(negotiateornot == negotiateset);
+             
+                  negotiatealert = "You are ready to negotiate";
+                       negotiateornot = negotiateset;
+         return ( negotiatoraddresshere, negotiatorfullname, negotiatorstatus, negotiatealert
+           );
+         
+         
+     }
+
+  
+   function calculate_OptimalSupplyQuantity(uint orderpaidperunitcost, uint _sellingprice, uint _salvagevalue, uint _retlossofgoodwillcost , uint _supplylossofgoodwillcost, uint supplierquantity, uint retperunitcost, uint suppliersperunitcost,  uint retordersize, uint expectedDemand, uint expectedTransferpayment) public returns(uint theorderpaidperunitcost, uint mysupplierperunitcost, uint lossofgoodwillcost, uint expectedorderhere)   {
+        
+                   uint time=0; uint r=0; uint ps =0; uint sr= 0; uint exRPT =0; uint  expectedRetailprofit=0;  uint totalgoodwillcost=0; uint totalcostperunitcost=0;  uint v=0;  uint pr=0;  uint SQ=0;  uint cr=0;  uint Q=0;  uint ED=0; uint eTP=0; uint p=0; uint c=0; uint w=0;
+            
+      
+            
+           r = _sellingprice;
+           v= _salvagevalue;
+
+          
+          ps= _supplylossofgoodwillcost;
+          pr = _retlossofgoodwillcost;
+          
+
+         SQ =supplierquantity;
+          sr = suppliersperunitcost;
+           cr = retperunitcost;
+          Q= retordersize;
+          ED=expectedDemand;
+          eTP =expectedTransferpayment;
+          exRPT= expectedRetailprofit;
+
+            totalgoodwillcost = _retlossofgoodwillcost + _supplylossofgoodwillcost;
+          totalcostperunitcost =  retperunitcost + suppliersperunitcost;
+           p = totalgoodwillcost;
+           c = totalcostperunitcost;
+           w =  orderpaidperunitcost;
+           exRPT =  (w-sr)/ps;
+             
+              theorderpaidperunitcost =0;
+              mysupplierperunitcost =0;
+              lossofgoodwillcost =0;
+              expectedorderhere =0;
+             theorderpaidperunitcost = w;
+              mysupplierperunitcost = sr;
+              lossofgoodwillcost = ps;
+             
+             
+         return (
+              theorderpaidperunitcost, mysupplierperunitcost,lossofgoodwillcost,expectedorderhere );
+         
+         
+     }
+  
+
+
+  
+   
+  
+     
+     // CALCULATE RETAILOR PROFIT
+  
+   function calculate_ExpectedRetailorProfit(uint _sellingprice, uint _salvagevalue, uint _retlossofgoodwillcost,uint supplierquantity, uint retperunitcost, uint retordersize, uint expectedDemand, uint expectedTransferpayment, uint retpaidorderperunit) public returns (uint expectedRetailprofit)   {
+         uint time=0; uint r=0;  uint v=0;  uint pr=0;  uint SQ=0;  uint cr=0;  uint Q=0;  uint ED=0; uint eTP=0; uint w=0;  uint exRPT =0; uint prED =0;
+          r=_sellingprice;
+          v =_salvagevalue;
+          w = retpaidorderperunit;
+          pr= _retlossofgoodwillcost;
+         SQ =supplierquantity;
+          cr = retperunitcost;
+          Q= retordersize;
+          ED=expectedDemand;
+          eTP =expectedTransferpayment;
+          exRPT=0;
+       exRPT =   expectedRetailprofit;
+          
+          eTP = w * Q;
+        exRPT= (r - v * pr)*SQ - (cr-v)*Q - prED - eTP;
+         
+             
+         return (exRPT);
+         }
+
+
+
+
+              // CALCULATE EXPECTED SUPPLY PROFIT
+  
+   function calculate_ExpectedSupplyProfit(uint _supplylossofgoodwillcost, uint supplierquantity, uint suppliersperunitcost,uint retordersize,  uint expectedDemand, uint expectedTransferpayment,  uint retpaidorderperunit ) public returns(uint expectedRetailprofit)   {
+          uint time=0;  uint ps=0;  uint SQ=0;  uint sr=0;  uint Q=0;  uint ED=0; uint eTP=0; uint exRPT =0; uint w =0;
+        
+          ps= _supplylossofgoodwillcost;
+         SQ =supplierquantity;
+          sr = suppliersperunitcost;
+          Q= retordersize;
+          ED=expectedDemand;
+          eTP =expectedTransferpayment;
+          exRPT= expectedRetailprofit;
+             
+             eTP = w * Q; 
+           exRPT = ps* SQ -sr* Q - ps* ED + eTP;           
+
+             
+         return (exRPT);
+         
+         
+     }
+
+              // CALCULATE EXPECTED TOTAL EXPECTED PROFIT
+     function calculateTotalExpectedProfit(uint _sellingprice, uint _salvagevalue, uint _retlossofgoodwillcost , uint _supplylossofgoodwillcost, uint supplierquantity, uint retperunitcost, uint suppliersperunitcost,  uint retordersize, uint expectedDemand, uint expectedTransferpayment  )
+              
+     public returns (uint exTotalexpectedProfit)  { 
+           uint time=0; uint r=0; uint ps=0; uint sr=0;  uint totalgoodwillcost=0; uint totalcostperunitcost=0;  uint v=0;  uint pr=0;  uint SQ=0;  uint cr=0;  uint Q=0;  uint ED=0; uint eTP=0; uint p=0; uint c=0; uint exRPT =0; uint expectedRetailprofit=0;
+            
+           r = _sellingprice;
+           v= _salvagevalue;
+
+          
+          ps= _supplylossofgoodwillcost;
+          pr = _retlossofgoodwillcost;
+          
+
+         SQ =supplierquantity;
+          sr = suppliersperunitcost;
+
+          Q= retordersize;
+          ED=expectedDemand;
+          eTP =expectedTransferpayment;
+          exRPT= expectedRetailprofit;
+
+            totalgoodwillcost = _retlossofgoodwillcost + _supplylossofgoodwillcost;
+          totalcostperunitcost =  retperunitcost + suppliersperunitcost;
+           p = totalgoodwillcost;
+           c = totalcostperunitcost;
+
+           exRPT =  ( r - v + p) * SQ - (c-v) * Q  - p * ED;          
+
+         exTotalexpectedProfit = 0;
+         exTotalexpectedProfit = exRPT;
+             
+         return (exTotalexpectedProfit);
+
+
+
+     }
+
+
+                   // CALCULATE SUPPLY OPTIMAL OREDERED QUANTITY
+function calculate_supplyOptimalOrderquantity(uint _sellingprice, uint _salvagevalue, uint _retlossofgoodwillcost , uint _supplylossofgoodwillcost, uint supplierquantity, uint retperunitcost, uint suppliersperunitcost,  uint retordersize, uint expectedDemand, uint expectedTransferpayment) public returns(address payable consumeraddressretrieved, bytes32 customerretrievedname, uint customerretrievedage)   {
+        
+                   uint time=0; uint r=0; uint ps=0; uint sr =0; uint exRPT =0;   uint totalgoodwillcost=0; uint totalcostperunitcost=0;  uint v=0;  uint pr=0;  uint SQ=0;  uint cr=0;  uint Q=0;  uint ED=0; uint eTP=0; uint p=0; uint c=0; uint expectedRetailprofit =0; uint w =0;
+            
+           r = _sellingprice;
+           v= _salvagevalue;
+
+          
+          ps= _supplylossofgoodwillcost;
+          pr = _retlossofgoodwillcost;
+          
+
+
+         SQ =supplierquantity;
+          sr = suppliersperunitcost;
+           cr = retperunitcost;
+          Q= retordersize;
+          ED=expectedDemand;
+          eTP =expectedTransferpayment;
+          exRPT= expectedRetailprofit;
+
+            totalgoodwillcost = _retlossofgoodwillcost + _supplylossofgoodwillcost;
+          totalcostperunitcost =  retperunitcost + suppliersperunitcost;
+           p = totalgoodwillcost;
+           c = totalcostperunitcost;
+
+           exRPT =  (w - sr)/ ps;
+             
+         return ( exRPT);
+         
+         
+     }
+     
+       
+              
+              // CALCULATE RETAIL OPTIMAL ORDER QUANTITY
+function calculate_retailOptimalOrderquantity(uint _sellingprice, uint _salvagevalue, uint _retlossofgoodwillcost , uint _supplylossofgoodwillcost, uint supplierquantity, uint retperunitcost, uint suppliersperunitcost,  uint retordersize, uint expectedDemand, uint expectedTransferpayment) public returns(address payable consumeraddressretrieved, bytes32 customerretrievedname, uint customerretrievedage, uint orderpaidperunitcost)   {
+        
+                   uint time=0; uint r=0; uint ps =0; uint sr= 0; uint exRPT =0; uint  expectedRetailprofit=0;  uint totalgoodwillcost=0; uint totalcostperunitcost=0;  uint v=0;  uint pr=0;  uint SQ=0;  uint cr=0;  uint Q=0;  uint ED=0; uint eTP=0; uint p=0; uint c=0; uint w=0;
+            
+           r = _sellingprice;
+           v= _salvagevalue;
+
+          
+          ps= _supplylossofgoodwillcost;
+          pr = _retlossofgoodwillcost;
+          
+
+         SQ =supplierquantity;
+          sr = suppliersperunitcost;
+           cr = retperunitcost;
+          Q= retordersize;
+          ED=expectedDemand;
+          eTP =expectedTransferpayment;
+          exRPT= expectedRetailprofit;
+
+            totalgoodwillcost = _retlossofgoodwillcost + _supplylossofgoodwillcost;
+          totalcostperunitcost =  retperunitcost + suppliersperunitcost;
+           p = totalgoodwillcost;
+           c = totalcostperunitcost;
+           w =  orderpaidperunitcost;
+           exRPT =   (w + cr - v) / r - v + pr;
+             
+         return ( exRPT);
+         
+         
+     }
+
+
+                      // CALCULATE OPTIMAL ORDER QUANTITY FOR WHOLE SUPPLY CHAIN
+
+     function calculate_optimalOrderquantity(uint _sellingprice, uint _salvagevalue, uint _retlossofgoodwillcost , uint _supplylossofgoodwillcost, uint supplierquantity, uint retperunitcost, uint suppliersperunitcost,  uint retordersize, uint expectedDemand, uint expectedTransferpayment) public returns(address payable consumeraddressretrieved, bytes32 customerretrievedname, uint customerretrievedage)   {
+        
+                   uint time=0; uint r=0;uint ps =0; uint sr=0; uint exRPT =0; uint expectedRetailprofit=0;    uint totalgoodwillcost=0; uint totalcostperunitcost=0;  uint v=0;  uint pr=0;  uint SQ=0;  uint cr=0;  uint Q=0;  uint ED=0; uint eTP=0; uint p=0; uint c=0;
+            
+           r = _sellingprice;
+           v= _salvagevalue;
+
+          
+          ps= _supplylossofgoodwillcost;
+          pr = _retlossofgoodwillcost;
+          
+
+         SQ =supplierquantity;
+          sr = suppliersperunitcost;
+          Q= retordersize;
+          ED=expectedDemand;
+          eTP =expectedTransferpayment;
+          exRPT= expectedRetailprofit;
+
+            totalgoodwillcost = _retlossofgoodwillcost + _supplylossofgoodwillcost;
+          totalcostperunitcost =  retperunitcost + suppliersperunitcost;
+           p = totalgoodwillcost;
+           c = totalcostperunitcost;
+
+           exRPT =  ( c - v ) / r - v + p;
+             
+         return ( exRPT);
+         
+         
+     }
+
+
+
+
+
+
+
+
+
+}
