@@ -1,0 +1,75 @@
+
+pragma solidity >=0.4.0 <0.6.0;
+ 
+
+
+ import "./EscrowComplianceCecker.sol";
+ import  "./Industry.sol";
+import  "./GameTheory.sol";
+contract   AddBidHere  {
+function addBid(bytes32 _bidname, bytes32 _biddername,  address payable _participant, bytes32 participantroles,uint _sellingprice, uint _salvagevalue, uint _retlossofgoodwillcost , uint _supplylossofgoodwillcost, uint supplierquantity, uint retperunitcost, uint suppliersperunitcost,  uint retordersize, uint expectedDemand, uint expectedTransferpayment,uint orderpaidperunitcost) public payable {
+
+            uint counter =0; i=0;    BidObject.bidcount =0;i =  BidObject.bidcount;
+
+          counter = i++;_sellingprice; _salvagevalue;
+          _supplylossofgoodwillcost;_retlossofgoodwillcost;retperunitcost;
+         supplierquantity;
+           suppliersperunitcost;
+          retordersize;
+          expectedDemand;
+          expectedTransferpayment;
+           orderpaidperunitcost;
+          
+
+                        
+       
+                      // GET BID DETAILS
+                   BidObject.bidstores[_participant][counter].bidname = _bidname;
+                   BidObject.bidstores[_participant][counter].bidderaddress = _participant;
+                   BidObject.bidstores[_participant][counter].biddername = _biddername;
+                   BidObject.bidstores[_participant][counter].bidrole =  participantroles;
+
+                        //PUSH  THE DETAILS OF THE OTHER BIDDING VALUES
+          
+              bidscollection.push(GameTheory.Bids(
+     {
+      bidname:  BidObject.bidstores[_participant][counter].bidname,
+      bidderaddress: BidObject.bidstores[_participant][counter].bidderaddress,
+      biddername:  BidObject.bidstores[_participant][counter].biddername,
+      bidrole:  BidObject.bidstores[_participant][counter].bidrole,
+      bidcount:  BidObject.bidstores[_participant][counter].bidcount
+ 
+
+        
+        
+    }));  
+
+           //ADDING VARIABLE VALUES
+               //CALCULATE EXPECTED RETAILOR'S PROFIT
+                require(BidObject.bidstores[_participant][counter].bidrole == 'Supplier');
+              
+           GameTheory.calculate_supplyOptimalOrderquantity( _salvagevalue, _retlossofgoodwillcost , _supplylossofgoodwillcost, supplierquantity, retperunitcost, suppliersperunitcost,retordersize, expectedDemand, expectedTransferpayment);
+           GameTheory.calculate_ExpectedSupplyProfit(_supplylossofgoodwillcost, supplierquantity, suppliersperunitcost,retordersize, expectedDemand, expectedTransferpayment, orderpaidperunitcost );
+               
+               
+               //CALCULATE EXPECTED RETAILOR'S PROFIT
+                require(BidObject.bidstores[_participant][counter].bidrole == 'Retailor');
+             
+             GameTheory.calculate_retailOptimalOrderquantity(_sellingprice, _salvagevalue, _retlossofgoodwillcost , _supplylossofgoodwillcost, supplierquantity, retperunitcost, suppliersperunitcost,  retordersize, expectedDemand, expectedTransferpayment,orderpaidperunitcost); 
+           
+         
+         
+           GameTheory.calculate_ExpectedRetailorProfit(_sellingprice, _salvagevalue,_retlossofgoodwillcost,supplierquantity,retperunitcost,retordersize,expectedDemand, expectedTransferpayment, orderpaidperunitcost);
+              
+        
+
+                 //WE CALCULATE THE OPTIMAL ORDER QUANTITY
+               
+              GameTheory.calculate_optimalOrderquantity(_sellingprice, _salvagevalue, _retlossofgoodwillcost , _supplylossofgoodwillcost, supplierquantity, retperunitcost, suppliersperunitcost, retordersize, expectedDemand, expectedTransferpayment);
+             
+
+          counter++;
+
+}
+
+}
